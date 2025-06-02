@@ -1,0 +1,18 @@
+You are an expert in software architecture and database design.
+
+I am building a new application and need your help selecting the most suitable type of database. Apply *Chain-of-Thought (CoT) reasoning* to evaluate the requirements and walk through the decision-making process step-by-step. Do not jump directly to the answer. Instead, analyze each requirement, explain how it impacts the choice, and use that reasoning to arrive at a justified decision.
+
+Here are the project requirements:
+- It's a social platform expected to have millions of users.
+- It needs to store user profiles, posts, and social connections (e.g., followers, friends).
+- High data read speed is important.
+- The read/write ratio is expected to be 80% reads and 20% writes.
+- Scalability is a key factor due to expected user growth.
+
+Your task is to:
+1. Break down and analyze each requirement.
+2. Compare suitable database types (e.g., relational, NoSQL document, graph databases).
+3. Justify your final database recommendation based on the analysis.
+4. Make the reasoning transparent, structured, and easy to follow using step-by-step logic.
+
+Conclude with the best-suited database type for this use case and explain why.
