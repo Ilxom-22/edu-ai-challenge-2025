@@ -1,0 +1,104 @@
+You are an AI expert performing a multi-perspective code review using role prompting.
+
+I will provide you with a function implementation. Analyze the code from the perspective of **three different expert roles**, each with a specific focus:
+
+1. **Experienced Software Developer**  
+   - Focus: Code readability, maintainability, clarity, naming, structure, modularity.
+   - Provide actionable suggestions to improve code quality, style, and future extensibility.
+
+2. **Security Engineer**  
+   - Focus: Security vulnerabilities, data exposure, validation/sanitization, injection risks, secure practices.
+   - Identify any potential security flaws and recommend how to fix or mitigate them.
+
+3. **Performance Specialist**  
+   - Focus: Execution efficiency, memory usage, unnecessary computations, scalability.
+   - Offer optimizations and trade-offs to improve speed or reduce resource consumption.
+
+Here is the code for review:
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+public class User
+{
+    public object Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+    public bool Active { get; set; }
+}
+
+public class UserProcessor
+{
+    public List<User> ProcessUserData(List<Dictionary<string, object>> data)
+    {
+        var users = new List<User>();
+
+        foreach (var item in data)
+        {
+            var user = new User();
+            
+            if (item.TryGetValue("id", out object idValue))
+                user.Id = idValue;
+            
+            if (item.TryGetValue("name", out object nameValue))
+                user.Name = nameValue?.ToString();
+            
+            if (item.TryGetValue("email", out object emailValue))
+                user.Email = emailValue?.ToString();
+            
+            if (item.TryGetValue("status", out object statusValue))
+                user.Active = statusValue?.ToString().Equals("active", StringComparison.OrdinalIgnoreCase) ?? false;
+            
+            users.Add(user);
+        }
+
+        Console.WriteLine($"Processed {users.Count} users");
+        return users;
+    }
+
+    public bool SaveToDatabase(List<User> users)
+    {
+        // TODO: Implement database connection
+        bool success = true;
+        return success;
+    }
+
+    static void Main()
+    {
+        var processor = new UserProcessor();
+        var data = new List<Dictionary<string, object>>
+        {
+            new Dictionary<string, object>
+            {
+                { "id", 1 },
+                { "name", "John" },
+                { "email", "john@example.com" },
+                { "status", "active" }
+            },
+            new Dictionary<string, object>
+            {
+                { "id", 2 },
+                { "name", "Jane" },
+                { "email", "jane@example.com" },
+                { "status", "inactive" }
+            }
+        };
+
+        var users = processor.ProcessUserData(data);
+        var saved = processor.SaveToDatabase(users);
+    }
+}
+
+
+Please review this code as each role above. For each role:
+
+Start by stating the role (e.g., “As an Experienced Software Developer…”)
+
+Provide detailed analysis based on the focus area.
+
+Give specific and actionable feedback, not generic advice.
+
+Present recommendations clearly in bullet points or short paragraphs.
+
+Conclude each role’s section before moving on to the next.
