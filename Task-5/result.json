@@ -1,0 +1,45 @@
+[
+  {
+    "sentiment": "Negative",
+    "isRelevant": true,
+    "mainSubject": "Sensor reliability and hardware issues",
+    "positives": [],
+    "painPoints": [
+      "Sensor stops tracking intermittently",
+      "Issue occurs even when plugged in",
+      "Dongle did not work with the first unit",
+      "High cost ($150) despite hardware issues"
+    ],
+    "improvementSuggestions": [
+      "Fix tracking stability issues at 8000Hz",
+      "Improve dongle reliability",
+      "Ensure better quality control for high-end pricing"
+    ],
+    "featuresMentioned": [
+      "Sensor",
+      "Wired and wireless connectivity",
+      "Dongle",
+      "Price"
+    ],
+    "userExpertise": "Experienced"
+  },
+  {
+    "sentiment": "Mixed",
+    "isRelevant": true,
+    "mainSubject": "Value proposition and pricing",
+    "positives": [
+      "No flaws from a personal usability standpoint"
+    ],
+    "painPoints": [
+      "Price not justified by performance compared to cheaper alternatives"
+    ],
+    "improvementSuggestions": [
+      "Reduce price or add differentiating features to justify cost"
+    ],
+    "featuresMentioned": [
+      "Performance",
+      "Price"
+    ],
+    "userExpertise": "Experienced"
+  }
+]
