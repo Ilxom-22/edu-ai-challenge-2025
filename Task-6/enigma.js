@@ -123,25 +123,6 @@ class Enigma {
   }
 }
 
-// =============================================================================
-// BUG ANALYSIS AND FIXES
-// =============================================================================
-/*
-BUGS IDENTIFIED AND FIXED:
-
-1. MISSING PLUGBOARD SWAP (CRITICAL):
-   - Issue: The original code only applied plugboard swapping once at the beginning
-   - Fix: Added second plugboard swap after the signal returns from reflector
-   - Impact: Without this, plugboard pairs didn't work correctly in both directions
-
-2. INCORRECT DOUBLE-STEPPING LOGIC:
-   - Issue: The original stepRotors() method had flawed double-stepping logic
-   - Fix: Implemented correct Enigma double-stepping mechanism
-   - Impact: Rotor advancement wasn't historically accurate
-
-The fixes ensure the Enigma simulation behaves exactly like the historical machine.
-*/
-
 function promptEnigma() {
   const rl = readline.createInterface({
     input: process.stdin,
