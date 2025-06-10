@@ -1,0 +1,43 @@
+{
+  "name": "enigma-machine-simulator",
+  "version": "1.0.0",
+  "description": "WWII Enigma cipher machine implementation in JavaScript with comprehensive bug fixes and testing",
+  "main": "enigma.js",
+  "scripts": {
+    "start": "node enigma.js",
+    "test": "node test.js",
+    "enigma": "node enigma.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "enigma",
+    "cipher",
+    "cryptography",
+    "wwii",
+    "encryption",
+    "decryption",
+    "rotor",
+    "plugboard",
+    "historical",
+    "simulation"
+  ],
+  "author": "EDU-AI-Challenge-2025",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "EDU-AI-Challenge-2025/Task-6"
+  },
+  "bugs": {
+    "url": "https://github.com/EDU-AI-Challenge-2025/Task-6/issues"
+  },
+  "homepage": "https://github.com/EDU-AI-Challenge-2025/Task-6#readme",
+  "files": [
+    "enigma.js",
+    "test.js",
+    "README.md"
+  ],
+  "dependencies": {},
+  "devDependencies": {}
+} 
