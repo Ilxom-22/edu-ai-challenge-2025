@@ -45,8 +45,6 @@ npm test
 
 ### Example
 ```
-Starting Enigma Machine...
-Enigma Machine Ready!
 Enter message: HELLO WORLD
 Rotor positions (e.g. 0 0 0): 0 0 0
 Ring settings (e.g. 0 0 0): 0 0 0
