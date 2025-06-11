@@ -173,19 +173,67 @@
 - **Deterministic Results**: Consistent test outcomes
 - **Edge Case Coverage**: Comprehensive boundary testing
 
-## 📈 Recommendations
+## 🚀 How to Run Tests
 
-### Test Improvements
-1. **Fix Random Placement**: Implement timeout or retry limit for ship placement
-2. **Add Performance Tests**: Verify game performance under load
-3. **Expand Error Testing**: Add more edge case validations
-4. **Mock External Dependencies**: Better isolation of readline interface
+### Prerequisites
+- **Node.js**: Any recent version (v12+ recommended)
+- **No additional dependencies**: Tests use built-in Node.js modules only
 
-### Coverage Enhancements
-1. **UI Testing**: Add GameUI method testing
-2. **Async Testing**: More comprehensive async/await testing
-3. **Concurrency Testing**: Multi-game instance testing
-4. **Stress Testing**: Large-scale ship placement scenarios
+### Running the Test Suite
+
+#### Basic Test Execution
+```bash
+# Navigate to the project directory
+cd Task-7
+
+# Run all tests
+node test.js
+```
+
+#### Expected Output
+```
+🧪 Running Sea Battle Game Unit Tests
+
+✅ Ship: Constructor should initialize locations and hits
+✅ Ship: hit() should mark location as hit and return true for valid hit
+... (31 more tests)
+
+📊 Test Summary
+================
+Total Tests: 33
+Passed: 33
+Failed: 0
+Pass Rate: 100.00%
+
+🎉 All tests passed!
+```
+
+#### Test Categories
+The test suite automatically runs tests in the following order:
+1. **Ship Class Tests** (7 tests) - Core ship functionality
+2. **Board Class Tests** (8 tests) - Game board operations
+3. **Player Class Tests** (2 tests) - Base player functionality
+4. **HumanPlayer Tests** (2 tests) - Human input validation
+5. **CPUPlayer Tests** (7 tests) - AI behavior and logic
+6. **Integration Tests** (3 tests) - End-to-end workflows
+7. **Error Handling Tests** (1 test) - Edge case validation
+
+#### Test Execution Features
+- **Fast Execution**: Complete suite runs in <200ms
+- **Detailed Output**: Each test shows pass/fail status with descriptive names
+- **Summary Report**: Final statistics with pass rate
+- **Exit Codes**: Returns 0 for success, 1 for failures
+- **No Side Effects**: Tests are isolated and don't interfere with each other
+
+#### Continuous Integration
+For automated testing environments:
+```bash
+# Silent mode (minimal output)
+node test.js > test_results.log 2>&1
+
+# Check exit code for CI/CD pipelines
+node test.js && echo "Tests passed" || echo "Tests failed"
+```
 
 ## 📋 Conclusion
 
