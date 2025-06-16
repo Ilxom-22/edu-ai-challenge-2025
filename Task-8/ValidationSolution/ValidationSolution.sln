@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidationApp", "ValidationApp\ValidationApp.csproj", "{2C5224C4-1DCD-4630-B5A7-293F868C776E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidationLibrary", "ValidationLibrary\ValidationLibrary.csproj", "{D623D9EE-7A3D-4B1C-9827-B00A01591E2F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2C5224C4-1DCD-4630-B5A7-293F868C776E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C5224C4-1DCD-4630-B5A7-293F868C776E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C5224C4-1DCD-4630-B5A7-293F868C776E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C5224C4-1DCD-4630-B5A7-293F868C776E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D623D9EE-7A3D-4B1C-9827-B00A01591E2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D623D9EE-7A3D-4B1C-9827-B00A01591E2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D623D9EE-7A3D-4B1C-9827-B00A01591E2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D623D9EE-7A3D-4B1C-9827-B00A01591E2F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
