@@ -411,6 +411,23 @@ class SeaBattleGame {
   }
 }
 
-// Start the game
-const game = new SeaBattleGame();
-game.start().catch(console.error);
+// Export classes and constants for testing
+module.exports = {
+  BOARD_SIZE,
+  NUM_SHIPS,
+  SHIP_LENGTH,
+  CELL_TYPES,
+  Ship,
+  Board,
+  Player,
+  HumanPlayer,
+  CPUPlayer,
+  GameUI,
+  SeaBattleGame
+};
+
+// Start the game only if this file is run directly
+if (require.main === module) {
+  const game = new SeaBattleGame();
+  game.start().catch(console.error);
+}
