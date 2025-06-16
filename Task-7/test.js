@@ -1,8 +1,19 @@
 const assert = require('assert');
 
-// Import the classes from seabattle.js by requiring and extracting them
-// Since the main file runs the game automatically, we'll need to modify our approach
-const { spawn } = require('child_process');
+// Import the classes from seabattle.js
+const {
+  BOARD_SIZE,
+  NUM_SHIPS,
+  SHIP_LENGTH,
+  CELL_TYPES,
+  Ship,
+  Board,
+  Player,
+  HumanPlayer,
+  CPUPlayer,
+  GameUI,
+  SeaBattleGame
+} = require('./seabattle.js');
 
 // Mock readline for testing
 const mockReadline = {
@@ -24,247 +35,6 @@ Module.prototype.require = function(id) {
 
 // Set test environment
 process.env.NODE_ENV = 'test';
-
-// Since the main file auto-executes, we'll recreate the classes for testing
-const BOARD_SIZE = 10;
-const NUM_SHIPS = 3;
-const SHIP_LENGTH = 3;
-const CELL_TYPES = {
-  WATER: '~',
-  SHIP: 'S',
-  HIT: 'X',
-  MISS: 'O'
-};
-
-// Ship class for testing
-class Ship {
-  constructor(locations) {
-    this.locations = locations;
-    this.hits = new Array(locations.length).fill(false);
-  }
-
-  hit(location) {
-    const index = this.locations.indexOf(location);
-    if (index >= 0 && !this.hits[index]) {
-      this.hits[index] = true;
-      return true;
-    }
-    return false;
-  }
-
-  isSunk() {
-    return this.hits.every(hit => hit);
-  }
-
-  hasLocation(location) {
-    return this.locations.includes(location);
-  }
-}
-
-// Board class for testing
-class Board {
-  constructor(showShips = false) {
-    this.grid = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(CELL_TYPES.WATER));
-    this.ships = [];
-    this.showShips = showShips;
-  }
-
-  placeShipsRandomly(numShips) {
-    let placedShips = 0;
-    
-    while (placedShips < numShips) {
-      const ship = this._generateRandomShip();
-      if (ship && this._canPlaceShip(ship.locations)) {
-        this.ships.push(ship);
-        if (this.showShips) {
-          this._markShipOnGrid(ship.locations);
-        }
-        placedShips++;
-      }
-    }
-  }
-
-  _generateRandomShip() {
-    const orientation = Math.random() < 0.5 ? 'horizontal' : 'vertical';
-    let startRow, startCol;
-
-    if (orientation === 'horizontal') {
-      startRow = Math.floor(Math.random() * BOARD_SIZE);
-      startCol = Math.floor(Math.random() * (BOARD_SIZE - SHIP_LENGTH + 1));
-    } else {
-      startRow = Math.floor(Math.random() * (BOARD_SIZE - SHIP_LENGTH + 1));
-      startCol = Math.floor(Math.random() * BOARD_SIZE);
-    }
-
-    const locations = [];
-    for (let i = 0; i < SHIP_LENGTH; i++) {
-      const row = orientation === 'horizontal' ? startRow : startRow + i;
-      const col = orientation === 'horizontal' ? startCol + i : startCol;
-      locations.push(`${row}${col}`);
-    }
-
-    return new Ship(locations);
-  }
-
-  _canPlaceShip(locations) {
-    return locations.every(location => {
-      const [row, col] = this._parseLocation(location);
-      return row >= 0 && row < BOARD_SIZE && 
-             col >= 0 && col < BOARD_SIZE && 
-             this.grid[row][col] === CELL_TYPES.WATER;
-    });
-  }
-
-  _markShipOnGrid(locations) {
-    locations.forEach(location => {
-      const [row, col] = this._parseLocation(location);
-      this.grid[row][col] = CELL_TYPES.SHIP;
-    });
-  }
-
-  processGuess(guess) {
-    const [row, col] = this._parseLocation(guess);
-    
-    if (this.grid[row][col] === CELL_TYPES.HIT || this.grid[row][col] === CELL_TYPES.MISS) {
-      return { success: false, reason: 'already_guessed' };
-    }
-
-    let hitShip = null;
-    for (const ship of this.ships) {
-      if (ship.hit(guess)) {
-        hitShip = ship;
-        break;
-      }
-    }
-
-    if (hitShip) {
-      this.grid[row][col] = CELL_TYPES.HIT;
-      return {
-        success: true,
-        hit: true,
-        sunk: hitShip.isSunk(),
-        location: guess
-      };
-    } else {
-      this.grid[row][col] = CELL_TYPES.MISS;
-      return {
-        success: true,
-        hit: false,
-        location: guess
-      };
-    }
-  }
-
-  _parseLocation(location) {
-    return [parseInt(location[0]), parseInt(location[1])];
-  }
-
-  getAliveShipsCount() {
-    return this.ships.filter(ship => !ship.isSunk()).length;
-  }
-
-  // Add manual ship placement for testing
-  addShip(locations) {
-    const ship = new Ship(locations);
-    this.ships.push(ship);
-    if (this.showShips) {
-      this._markShipOnGrid(locations);
-    }
-    return ship;
-  }
-}
-
-// Player classes for testing
-class Player {
-  constructor(name, board) {
-    this.name = name;
-    this.board = board;
-    this.guesses = new Set();
-  }
-
-  hasGuessed(location) {
-    return this.guesses.has(location);
-  }
-
-  addGuess(location) {
-    this.guesses.add(location);
-  }
-}
-
-class HumanPlayer extends Player {
-  constructor(board) {
-    super('Player', board);
-  }
-
-  _isValidGuess(guess) {
-    return !!(guess && guess.length === 2 && /^\d{2}$/.test(guess));
-  }
-}
-
-class CPUPlayer extends Player {
-  constructor(board) {
-    super('CPU', board);
-    this.mode = 'hunt';
-    this.targetQueue = [];
-  }
-
-  makeGuess() {
-    let guess;
-
-    if (this.mode === 'target' && this.targetQueue.length > 0) {
-      guess = this.targetQueue.shift();
-      if (this.hasGuessed(guess)) {
-        if (this.targetQueue.length === 0) {
-          this.mode = 'hunt';
-        }
-        return this.makeGuess();
-      }
-    } else {
-      this.mode = 'hunt';
-      do {
-        const row = Math.floor(Math.random() * BOARD_SIZE);
-        const col = Math.floor(Math.random() * BOARD_SIZE);
-        guess = `${row}${col}`;
-      } while (this.hasGuessed(guess));
-    }
-
-    this.addGuess(guess);
-    return guess;
-  }
-
-  processGuessResult(guess, result) {
-    if (result.hit) {
-      if (result.sunk) {
-        this.mode = 'hunt';
-        this.targetQueue = [];
-      } else {
-        this.mode = 'target';
-        this._addAdjacentTargets(guess);
-      }
-    } else if (this.mode === 'target' && this.targetQueue.length === 0) {
-      this.mode = 'hunt';
-    }
-  }
-
-  _addAdjacentTargets(location) {
-    const [row, col] = [parseInt(location[0]), parseInt(location[1])];
-    const adjacent = [
-      { r: row - 1, c: col },
-      { r: row + 1, c: col },
-      { r: row, c: col - 1 },
-      { r: row, c: col + 1 }
-    ];
-
-    adjacent.forEach(({ r, c }) => {
-      if (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE) {
-        const adjLocation = `${r}${c}`;
-        if (!this.hasGuessed(adjLocation) && !this.targetQueue.includes(adjLocation)) {
-          this.targetQueue.push(adjLocation);
-        }
-      }
-    });
-  }
-}
 
 // Test runner
 class TestRunner {
@@ -404,87 +174,187 @@ runner.test('Board: _parseLocation() should correctly parse location string', ()
   assert.strictEqual(col, 4);
 });
 
-runner.test('Board: addShip() should add ship to board', () => {
+runner.test('Board: _generateRandomShip() should create valid ship', () => {
   const board = new Board();
+  const ship = board._generateRandomShip();
+  
+  assert.ok(ship instanceof Ship);
+  assert.strictEqual(ship.locations.length, SHIP_LENGTH);
+  
+  // Check if all locations are valid
+  ship.locations.forEach(location => {
+    const [row, col] = board._parseLocation(location);
+    assert.ok(row >= 0 && row < BOARD_SIZE);
+    assert.ok(col >= 0 && col < BOARD_SIZE);
+  });
+  
+  // Check if locations are consecutive
+  const rows = ship.locations.map(loc => parseInt(loc[0]));
+  const cols = ship.locations.map(loc => parseInt(loc[1]));
+  
+  const isHorizontal = rows.every(r => r === rows[0]);
+  const isVertical = cols.every(c => c === cols[0]);
+  
+  assert.ok(isHorizontal || isVertical);
+  
+  if (isHorizontal) {
+    assert.deepStrictEqual(cols, Array.from({length: SHIP_LENGTH}, (_, i) => cols[0] + i));
+  } else {
+    assert.deepStrictEqual(rows, Array.from({length: SHIP_LENGTH}, (_, i) => rows[0] + i));
+  }
+});
+
+runner.test('Board: _markShipOnGrid() should mark ship locations', () => {
+  const board = new Board(true);
   const locations = ['00', '01', '02'];
   
-  const ship = board.addShip(locations);
-  assert.strictEqual(board.ships.length, 1);
-  assert.strictEqual(board.ships[0], ship);
+  board._markShipOnGrid(locations);
+  
+  locations.forEach(location => {
+    const [row, col] = board._parseLocation(location);
+    assert.strictEqual(board.grid[row][col], CELL_TYPES.SHIP);
+  });
+});
+
+runner.test('Board: placeShipsRandomly() should place correct number of ships', () => {
+  const board = new Board(true);
+  board.placeShipsRandomly(NUM_SHIPS);
+  
+  assert.strictEqual(board.ships.length, NUM_SHIPS);
+});
+
+runner.test('Board: placeShipsRandomly() should mark ships on grid when showShips is true', () => {
+  const board = new Board(true);
+  board.placeShipsRandomly(NUM_SHIPS);
+  
+  let shipCells = 0;
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    for (let j = 0; j < BOARD_SIZE; j++) {
+      if (board.grid[i][j] === CELL_TYPES.SHIP) {
+        shipCells++;
+      }
+    }
+  }
+  
+  assert.strictEqual(shipCells, NUM_SHIPS * SHIP_LENGTH);
+});
+
+runner.test('Board: placeShipsRandomly() should not mark ships on grid when showShips is false', () => {
+  const board = new Board(false);
+  board.placeShipsRandomly(NUM_SHIPS);
+  
+  let shipCells = 0;
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    for (let j = 0; j < BOARD_SIZE; j++) {
+      if (board.grid[i][j] === CELL_TYPES.SHIP) {
+        shipCells++;
+      }
+    }
+  }
+  
+  assert.strictEqual(shipCells, 0);
 });
 
 runner.test('Board: processGuess() should return hit result for ship location', () => {
-  const board = new Board();
-  board.addShip(['00', '01', '02']);
+  const board = new Board(true);
+  board.placeShipsRandomly(1);
   
-  const result = board.processGuess('01');
+  // Find a ship location
+  let shipLocation = null;
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    for (let j = 0; j < BOARD_SIZE; j++) {
+      if (board.grid[i][j] === CELL_TYPES.SHIP) {
+        shipLocation = `${i}${j}`;
+        break;
+      }
+    }
+    if (shipLocation) break;
+  }
+  
+  const result = board.processGuess(shipLocation);
   assert.strictEqual(result.success, true);
   assert.strictEqual(result.hit, true);
-  assert.strictEqual(result.location, '01');
-  assert.strictEqual(board.grid[0][1], CELL_TYPES.HIT);
+  assert.strictEqual(result.location, shipLocation);
+  assert.strictEqual(board.grid[parseInt(shipLocation[0])][parseInt(shipLocation[1])], CELL_TYPES.HIT);
 });
 
 runner.test('Board: processGuess() should return miss result for water location', () => {
-  const board = new Board();
-  board.addShip(['00', '01', '02']);
+  const board = new Board(true);
+  board.placeShipsRandomly(1);
   
-  const result = board.processGuess('99');
+  // Find a water location
+  let waterLocation = null;
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    for (let j = 0; j < BOARD_SIZE; j++) {
+      if (board.grid[i][j] === CELL_TYPES.WATER) {
+        waterLocation = `${i}${j}`;
+        break;
+      }
+    }
+    if (waterLocation) break;
+  }
+  
+  const result = board.processGuess(waterLocation);
   assert.strictEqual(result.success, true);
   assert.strictEqual(result.hit, false);
-  assert.strictEqual(result.location, '99');
-  assert.strictEqual(board.grid[9][9], CELL_TYPES.MISS);
-});
-
-runner.test('Board: processGuess() should return sunk true when ship is sunk', () => {
-  const board = new Board();
-  board.addShip(['00', '01', '02']);
-  
-  board.processGuess('00');
-  board.processGuess('01');
-  const result = board.processGuess('02');
-  
-  assert.strictEqual(result.sunk, true);
+  assert.strictEqual(result.location, waterLocation);
+  assert.strictEqual(board.grid[parseInt(waterLocation[0])][parseInt(waterLocation[1])], CELL_TYPES.MISS);
 });
 
 runner.test('Board: processGuess() should reject already guessed location', () => {
-  const board = new Board();
-  board.addShip(['00', '01', '02']);
+  const board = new Board(true);
+  board.placeShipsRandomly(1);
   
-  board.processGuess('01'); // First guess
-  const result = board.processGuess('01'); // Second guess
+  // Find a ship location
+  let shipLocation = null;
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    for (let j = 0; j < BOARD_SIZE; j++) {
+      if (board.grid[i][j] === CELL_TYPES.SHIP) {
+        shipLocation = `${i}${j}`;
+        break;
+      }
+    }
+    if (shipLocation) break;
+  }
+  
+  board.processGuess(shipLocation); // First guess
+  const result = board.processGuess(shipLocation); // Second guess
   
   assert.strictEqual(result.success, false);
   assert.strictEqual(result.reason, 'already_guessed');
 });
 
 runner.test('Board: getAliveShipsCount() should return correct count', () => {
-  const board = new Board();
-  board.addShip(['00', '01', '02']);
-  board.addShip(['44', '45', '46']);
+  const board = new Board(true);
+  board.placeShipsRandomly(NUM_SHIPS);
   
-  assert.strictEqual(board.getAliveShipsCount(), 2);
+  assert.strictEqual(board.getAliveShipsCount(), NUM_SHIPS);
   
   // Sink one ship
-  board.processGuess('00');
-  board.processGuess('01');
-  board.processGuess('02');
+  const ship = board.ships[0];
+  ship.locations.forEach(location => {
+    board.processGuess(location);
+  });
   
-  assert.strictEqual(board.getAliveShipsCount(), 1);
+  assert.strictEqual(board.getAliveShipsCount(), NUM_SHIPS - 1);
 });
 
-
-
-runner.test('Board: _canPlaceShip() should validate ship placement', () => {
-  const board = new Board(true); // Enable showShips to mark ships on grid
+runner.test('Board: display() should return correct string format', () => {
+  const board = new Board(true);
+  board.placeShipsRandomly(1);
   
-  // Valid placement
-  assert.strictEqual(board._canPlaceShip(['00', '01', '02']), true);
+  const display = board.display();
+  const lines = display.split('\n');
   
-  // Add a ship first - this will mark grid cells as 'S'
-  const ship = board.addShip(['00', '01', '02']);
+  // Check header
+  assert.strictEqual(lines[0].trim(), '0 1 2 3 4 5 6 7 8 9');
   
-  // Overlapping placement should be invalid because grid cells are no longer water
-  assert.strictEqual(board._canPlaceShip(['01', '02', '03']), false);
+  // Check grid lines
+  for (let i = 1; i <= BOARD_SIZE; i++) {
+    const line = lines[i].trim();
+    assert.strictEqual(line.length, BOARD_SIZE * 2 + 1); // Each cell is 2 chars + space
+    assert.strictEqual(line[0], String(i - 1)); // Row number
+  }
 });
 
 // PLAYER CLASS TESTS
@@ -530,7 +400,7 @@ runner.test('HumanPlayer: _isValidGuess() should validate input correctly', () =
   assert.strictEqual(player._isValidGuess('000'), false);
   assert.strictEqual(player._isValidGuess('ab'), false);
   
-  // Edge cases - these return false because the first condition (guess) fails
+  // Edge cases
   assert.strictEqual(player._isValidGuess(''), false);
   assert.strictEqual(player._isValidGuess(null), false);
   assert.strictEqual(player._isValidGuess(undefined), false);
@@ -624,83 +494,42 @@ runner.test('CPUPlayer: _addAdjacentTargets() should not add already guessed cel
   assert.strictEqual(player.targetQueue.includes('45'), true);
 });
 
-// INTEGRATION TESTS
-runner.test('Integration: Complete ship sinking workflow', () => {
-  const board = new Board();
-  const ship = board.addShip(['00', '01', '02']);
-  
-  // Hit all locations
-  let result1 = board.processGuess('00');
-  assert.strictEqual(result1.hit, true);
-  assert.strictEqual(result1.sunk, false);
-  
-  let result2 = board.processGuess('01');
-  assert.strictEqual(result2.hit, true);
-  assert.strictEqual(result2.sunk, false);
-  
-  let result3 = board.processGuess('02');
-  assert.strictEqual(result3.hit, true);
-  assert.strictEqual(result3.sunk, true);
-  
-  assert.strictEqual(ship.isSunk(), true);
-  assert.strictEqual(board.getAliveShipsCount(), 0);
+// GAME UI TESTS
+runner.test('GameUI: Constructor should initialize readline interface', () => {
+  const gameUI = new GameUI();
+  assert.ok(gameUI.rl);
 });
 
-runner.test('Integration: CPU AI workflow from hunt to target to hunt', () => {
-  const board = new Board();
-  board.addShip(['44', '45', '46']);
-  const cpu = new CPUPlayer(board);
-  
-  // Start in hunt mode
-  assert.strictEqual(cpu.mode, 'hunt');
-  
-  // Simulate hit
-  cpu.processGuessResult('44', { hit: true, sunk: false });
-  assert.strictEqual(cpu.mode, 'target');
-  assert.strictEqual(cpu.targetQueue.length > 0, true);
-  
-  // Simulate sinking the ship
-  cpu.processGuessResult('45', { hit: true, sunk: true });
-  assert.strictEqual(cpu.mode, 'hunt');
-  assert.strictEqual(cpu.targetQueue.length, 0);
+runner.test('GameUI: displayMessage should log message', () => {
+  const gameUI = new GameUI();
+  const message = 'Test message';
+  gameUI.displayMessage(message);
+  // Note: We can't easily test console.log output
 });
 
-runner.test('Integration: Multiple ships on board', () => {
-  const board = new Board();
-  board.addShip(['00', '01', '02']);
-  board.addShip(['44', '54', '64']);
-  board.addShip(['77', '78', '79']);
-  
-  assert.strictEqual(board.getAliveShipsCount(), 3);
-  
-  // Sink first ship
-  board.processGuess('00');
-  board.processGuess('01');
-  board.processGuess('02');
-  assert.strictEqual(board.getAliveShipsCount(), 2);
-  
-  // Partially hit second ship
-  board.processGuess('44');
-  assert.strictEqual(board.getAliveShipsCount(), 2);
-  
-  // Sink second ship
-  board.processGuess('54');
-  board.processGuess('64');
-  assert.strictEqual(board.getAliveShipsCount(), 1);
+runner.test('GameUI: getPlayerInput should return promise', () => {
+  const gameUI = new GameUI();
+  const inputPromise = gameUI.getPlayerInput();
+  assert.ok(inputPromise instanceof Promise);
 });
 
-// Error handling tests
-runner.test('Error Handling: Board should handle edge cases', () => {
-  const board = new Board();
+// SEA BATTLE GAME TESTS
+runner.test('SeaBattleGame: Constructor should initialize game components', () => {
+  const game = new SeaBattleGame();
   
-  // Test parsing edge coordinates
-  let [row, col] = board._parseLocation('00');
-  assert.strictEqual(row, 0);
-  assert.strictEqual(col, 0);
+  assert.ok(game.playerBoard instanceof Board);
+  assert.ok(game.cpuBoard instanceof Board);
+  assert.ok(game.humanPlayer instanceof HumanPlayer);
+  assert.ok(game.cpuPlayer instanceof CPUPlayer);
+  assert.ok(game.gameUI instanceof GameUI);
+});
+
+runner.test('SeaBattleGame: _initializeGame should place ships', () => {
+  const game = new SeaBattleGame();
+  game._initializeGame();
   
-  [row, col] = board._parseLocation('99');
-  assert.strictEqual(row, 9);
-  assert.strictEqual(col, 9);
+  assert.strictEqual(game.playerBoard.ships.length, NUM_SHIPS);
+  assert.strictEqual(game.cpuBoard.ships.length, NUM_SHIPS);
 });
 
 // Run all tests
@@ -711,4 +540,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { runner, Ship, Board, Player, HumanPlayer, CPUPlayer };
+module.exports = { runner }; 
