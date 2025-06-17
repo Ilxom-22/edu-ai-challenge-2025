@@ -152,7 +152,7 @@ namespace ValidationLibrary.Validators
         /// <param name="message">Custom error message</param>
         /// <param name="comparer">Optional equality comparer</param>
         /// <returns>This validator instance for method chaining</returns>
-        public CollectionValidator<TCollection, TItem> Unique(string message = "Collection items must be unique.", IEqualityComparer<TItem>? comparer = null)
+        public CollectionValidator<TCollection, TItem> Unique(string message = "Collection must contain unique items.", IEqualityComparer<TItem>? comparer = null)
         {
             return (CollectionValidator<TCollection, TItem>)AddRule(value =>
             {
@@ -177,7 +177,7 @@ namespace ValidationLibrary.Validators
         /// <returns>This validator instance for method chaining</returns>
         public CollectionValidator<TCollection, TItem> Contains(TItem item, string? message = null, IEqualityComparer<TItem>? comparer = null)
         {
-            message ??= $"Collection must contain the item: {item}";
+            message ??= $"Collection must contain: {item}";
             return (CollectionValidator<TCollection, TItem>)AddRule(value =>
             {
                 if (value == null)
@@ -199,7 +199,7 @@ namespace ValidationLibrary.Validators
         /// <returns>This validator instance for method chaining</returns>
         public CollectionValidator<TCollection, TItem> DoesNotContain(TItem item, string? message = null, IEqualityComparer<TItem>? comparer = null)
         {
-            message ??= $"Collection must not contain the item: {item}";
+            message ??= $"Collection must not contain: {item}";
             return (CollectionValidator<TCollection, TItem>)AddRule(value =>
             {
                 if (value == null)

@@ -8,7 +8,7 @@ namespace ValidationLibrary.Core
         /// <summary>
         /// Gets the error message describing what validation failed.
         /// </summary>
-        public string Message { get; }
+        public string? Message { get; }
 
         /// <summary>
         /// Gets the name of the property that failed validation, if applicable.
@@ -38,9 +38,9 @@ namespace ValidationLibrary.Core
         /// <param name="propertyPath">The path to the property that failed validation</param>
         /// <param name="errorCode">The error code for programmatic error handling</param>
         /// <param name="context">Additional context or metadata about the error</param>
-        public ValidationError(string message, string? propertyName = null, string? propertyPath = null, string? errorCode = null, object? context = null)
+        public ValidationError(string? message, string? propertyName = null, string? propertyPath = null, string? errorCode = null, object? context = null)
         {
-            Message = message ?? throw new ArgumentNullException(nameof(message));
+            Message = message;
             PropertyName = propertyName;
             PropertyPath = propertyPath ?? propertyName;
             ErrorCode = errorCode;
@@ -108,7 +108,7 @@ namespace ValidationLibrary.Core
         /// <returns>A string representation of the validation error</returns>
         public override string ToString()
         {
-            var result = Message;
+            var result = Message ?? string.Empty;
             if (!string.IsNullOrEmpty(PropertyPath))
                 result = $"{PropertyPath}: {result}";
             if (!string.IsNullOrEmpty(ErrorCode))

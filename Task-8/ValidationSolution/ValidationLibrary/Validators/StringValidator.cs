@@ -60,7 +60,7 @@ namespace ValidationLibrary.Validators
         public StringValidator MinLength(int minLength, string? message = null)
         {
             message ??= $"Value must be at least {minLength} characters long.";
-            return (StringValidator)AddRule(value => value?.Length >= minLength, message, "STRING_MIN_LENGTH");
+            return (StringValidator)AddRule(value => string.IsNullOrEmpty(value) || value.Length >= minLength, message, "STRING_MIN_LENGTH");
         }
 
         /// <summary>

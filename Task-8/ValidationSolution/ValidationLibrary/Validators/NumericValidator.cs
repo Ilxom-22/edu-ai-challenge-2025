@@ -93,7 +93,7 @@ namespace ValidationLibrary.Validators
         /// <returns>This validator instance for method chaining</returns>
         public NumericValidator<T> Equal(T expected, string? message = null)
         {
-            message ??= $"Value must equal {expected}.";
+            message ??= $"Value must be equal to {expected}.";
             return (NumericValidator<T>)AddRule(value => value.Equals(expected), message, "NUMERIC_EQUAL");
         }
 
@@ -105,7 +105,7 @@ namespace ValidationLibrary.Validators
         /// <returns>This validator instance for method chaining</returns>
         public NumericValidator<T> NotEqual(T forbidden, string? message = null)
         {
-            message ??= $"Value must not equal {forbidden}.";
+            message ??= $"Value must not be equal to {forbidden}.";
             return (NumericValidator<T>)AddRule(value => !value.Equals(forbidden), message, "NUMERIC_NOT_EQUAL");
         }
 

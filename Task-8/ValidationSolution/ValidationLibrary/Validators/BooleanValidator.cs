@@ -48,7 +48,7 @@ namespace ValidationLibrary.Validators
         /// <returns>This validator instance for method chaining</returns>
         public BooleanValidator Equal(bool expected, string? message = null)
         {
-            message ??= $"Value must be {expected}.";
+            message ??= $"Value must be equal to {expected}.";
             return (BooleanValidator)AddRule(value => value == expected, message, "BOOLEAN_EQUAL");
         }
     }
