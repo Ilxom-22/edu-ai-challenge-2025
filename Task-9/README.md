@@ -55,6 +55,11 @@ A powerful Python console application that generates comprehensive, markdown-for
    ```bash
    python main.py --api-key "your-api-key-here" --service "Spotify"
    ```
+   
+   **Option C: Create .env file and set your OpenAI key inside it**
+   ```bash
+   OPENAI_API_KEY="your-open-ai-key-here"
+   ```
 
 ## 💡 Usage
 
@@ -121,44 +126,6 @@ python main.py --service "WhatsApp" --output whatsapp_report.md
 python main.py --api-key "sk-..." --service "Zoom"
 ```
 
-## 🔍 Sample Output Structure
-
-Each generated report includes the following sections:
-
-```markdown
-## Brief History
-- Founding information and key milestones
-- Important developments and timeline
-
-## Target Audience
-- Primary user segments and demographics
-- Key use cases and user scenarios
-
-## Core Features
-- Top 2-4 key functionalities
-- Main capabilities users rely on
-
-## Unique Selling Points
-- Key differentiators from competitors
-- What makes this service stand out
-
-## Business Model
-- Revenue generation strategies
-- Pricing and monetization approaches
-
-## Tech Stack Insights
-- Technologies likely used
-- Technical architecture considerations
-
-## Perceived Strengths
-- Standout features and advantages
-- What users typically praise
-
-## Perceived Weaknesses
-- Common criticisms or limitations
-- Areas for potential improvement
-```
-
 ## 🛠️ Troubleshooting
 
 ### Common Issues
@@ -183,24 +150,6 @@ Run the application with `--help` to see all available options:
 python main.py --help
 ```
 
-## 🔑 API Key Setup Guide
-
-1. **Get an OpenAI API Key**:
-   - Visit [OpenAI's API platform](https://platform.openai.com/)
-   - Sign up or log in to your account
-   - Navigate to API Keys section
-   - Create a new API key
-
-2. **Set Environment Variable**:
-   - **Windows PowerShell**: `$env:OPENAI_API_KEY="your-key"`
-   - **Windows CMD**: `set OPENAI_API_KEY=your-key`
-   - **macOS/Linux**: `export OPENAI_API_KEY="your-key"`
-
-3. **Verify Setup**:
-   ```bash
-   python main.py --service "Test"
-   ```
-
 ## 📝 Notes
 
 - The application uses GPT-4 for high-quality analysis
@@ -208,11 +157,3 @@ python main.py --help
 - Generated reports are based on publicly available information and AI analysis
 - Processing time typically ranges from 10-30 seconds depending on complexity
 - Reports are generated in markdown format for easy reading and sharing
-
-## 🤝 Contributing
-
-Feel free to submit issues, feature requests, or pull requests to improve this tool.
-
-## 📄 License
-
-This project is provided as-is for educational and professional use. 
