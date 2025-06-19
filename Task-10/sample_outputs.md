@@ -6,7 +6,7 @@ This document shows real execution examples of the Natural Language Product Sear
 
 ### Input Query:
 ```
-🔍 What products are you looking for? Show me in-stock electronics under $300 with at least 4 stars
+🔍 What products are you looking for? (or 'quit' to exit): Show me in-stock electronics under $300 with at least 4 stars
 ```
 
 ### Output:
@@ -18,7 +18,7 @@ This document shows real execution examples of the Natural Language Product Sear
 ============================================================
    • Category: Electronics
    • Maximum Price: $300
-   • Minimum Rating: 4.0 stars
+   • Minimum Rating: 4 stars
    • In Stock Only: Yes
 
 ============================================================
@@ -27,13 +27,12 @@ This document shows real execution examples of the Natural Language Product Sear
 1. Wireless Headphones - $99.99, Rating: 4.5, In Stock
 2. Smart Watch - $199.99, Rating: 4.6, In Stock
 3. Bluetooth Speaker - $49.99, Rating: 4.4, In Stock
-4. 4K Monitor - $349.99, Rating: 4.7, In Stock
-5. Noise-Cancelling Headphones - $299.99, Rating: 4.8, In Stock
-6. Gaming Mouse - $59.99, Rating: 4.3, In Stock
-7. External Hard Drive - $89.99, Rating: 4.4, In Stock
-8. Portable Charger - $29.99, Rating: 4.2, In Stock
+4. Noise-Cancelling Headphones - $299.99, Rating: 4.8, In Stock
+5. Gaming Mouse - $59.99, Rating: 4.3, In Stock
+6. External Hard Drive - $89.99, Rating: 4.4, In Stock
+7. Portable Charger - $29.99, Rating: 4.2, In Stock
 
-Found 8 product(s) matching your criteria.
+Found 7 product(s) matching your criteria.
 ```
 
 ---
@@ -42,7 +41,7 @@ Found 8 product(s) matching your criteria.
 
 ### Input Query:
 ```
-🔍 What products are you looking for? I want fitness equipment below $100 with good ratings
+🔍 What products are you looking for? (or 'quit' to exit): I want fitness equipment below $100 with good ratings
 ```
 
 ### Output:
@@ -64,9 +63,10 @@ Found 8 product(s) matching your criteria.
 3. Kettlebell - $39.99, Rating: 4.3, In Stock
 4. Foam Roller - $24.99, Rating: 4.5, In Stock
 5. Pull-up Bar - $59.99, Rating: 4.4, In Stock
-6. Ab Roller - $19.99, Rating: 4.2, In Stock
+6. Jump Rope - $9.99, Rating: 4.0, In Stock
+7. Ab Roller - $19.99, Rating: 4.2, In Stock
 
-Found 6 product(s) matching your criteria.
+Found 7 product(s) matching your criteria.
 ```
 
 ---
@@ -75,7 +75,7 @@ Found 6 product(s) matching your criteria.
 
 ### Input Query:
 ```
-🔍 What products are you looking for? Find me programming or science books under $50
+🔍 What products are you looking for? (or 'quit' to exit): Find me programming or science books under $50
 ```
 
 ### Output:
@@ -94,8 +94,9 @@ Found 6 product(s) matching your criteria.
 ============================================================
 1. Programming Guide - $49.99, Rating: 4.7, In Stock
 2. History of Science - $39.99, Rating: 4.6, In Stock
+3. Science Fiction Novel - $17.99, Rating: 4.2, In Stock
 
-Found 2 product(s) matching your criteria.
+Found 3 product(s) matching your criteria.
 ```
 
 ---
@@ -104,7 +105,7 @@ Found 2 product(s) matching your criteria.
 
 ### Input Query:
 ```
-🔍 What products are you looking for? Show me kitchen appliances that are in stock, cost between $50 and $200, and have at least 4.5 stars
+🔍 What products are you looking for? (or 'quit' to exit): Show me kitchen appliances that are in stock, cost between $50 and $200, and have at least 4.5 stars
 ```
 
 ### Output:
@@ -124,10 +125,9 @@ Found 2 product(s) matching your criteria.
 🛍️  FILTERED PRODUCTS:
 ============================================================
 1. Air Fryer - $89.99, Rating: 4.6, In Stock
-2. Microwave Oven - $129.99, Rating: 4.5, In Stock
-3. Pressure Cooker - $99.99, Rating: 4.7, In Stock
+2. Pressure Cooker - $99.99, Rating: 4.7, In Stock
 
-Found 3 product(s) matching your criteria.
+Found 2 product(s) matching your criteria.
 ```
 
 ---
@@ -148,43 +148,12 @@ Found 3 product(s) matching your criteria.
 ============================================================
    • Category: Electronics
    • Maximum Price: $20
-   • Minimum Rating: 5.0 stars
+   • Minimum Rating: 5 stars
+   • Maximum Rating: 5 stars
 
 ============================================================
 🛍️  FILTERED PRODUCTS:
 ============================================================
    No products found matching your criteria.
-
-Found 0 product(s) matching your criteria.
 ```
 
----
-
-## 📊 Analysis of Sample Runs
-
-### Key Observations:
-
-1. **AI Understanding**: The AI successfully interprets various natural language patterns:
-   - "under $300" → max_price: 300
-   - "at least 4 stars" → min_rating: 4.0
-   - "in-stock" → in_stock_only: true
-   - "between $50 and $200" → min_price: 50, max_price: 200
-
-2. **Flexible Queries**: The system handles:
-   - Single criteria (category only)
-   - Multiple criteria combinations
-   - Keyword-based searches
-   - Complex price ranges
-
-3. **Clear Output**: Results show both:
-   - AI-extracted criteria for transparency
-   - Formatted product list with essential details
-
-4. **Edge Cases**: Gracefully handles scenarios with no matching products
-
-5. **Natural Language Variations**: Successfully processes different phrasings:
-   - "Show me..." vs "I want..." vs "Find me..."
-   - "good ratings" vs "at least 4 stars"
-   - "below $100" vs "under $100"
-
-These examples demonstrate the tool's ability to understand natural language and convert it into structured search criteria using OpenAI's function calling capability. 

@@ -52,10 +52,21 @@ Price range: $9.99 - $1299.99
 Rating range: 4.0 - 4.8
 
 When a user asks for products, analyze their request and call the filter_products function with appropriate criteria.
-Be intelligent about interpreting natural language - for example:
+Be intelligent about interpreting natural language:
+
+IMPORTANT STOCK FILTERING RULES:
+- For "in stock" or "available" products: set in_stock_only: true
+- For "out of stock" or "unavailable" products: set in_stock_only: false
+- If no stock preference is mentioned: leave in_stock_only as null/undefined
+
+IMPORTANT RATING FILTERING RULES:
+- For "at least X stars" or "X stars or higher": use min_rating: X
+- For "less than X stars", "below X stars", or "lower than X stars": use max_rating: X (not min_rating: 0)
+- For "exactly X stars": use both min_rating: X and max_rating: X
+- Never use min_rating: 0 for "lower than" queries - this includes all products regardless of rating
+
+OTHER EXAMPLES:
 - "under $300" means max_price: 300
-- "at least 4 stars" means min_rating: 4.0
-- "in stock" means in_stock_only: true
 - "electronics" refers to category: "Electronics"
 - "fitness tracker" might mean category: "Fitness" and keywords: ["tracker"]
 
@@ -89,6 +100,7 @@ Always call the filter_products function to process the user's request."""
                     max_price=criteria.get('max_price'),
                     min_price=criteria.get('min_price'),
                     min_rating=criteria.get('min_rating'),
+                    max_rating=criteria.get('max_rating'),
                     in_stock_only=criteria.get('in_stock_only'),
                     keywords=criteria.get('keywords')
                 )
@@ -116,8 +128,13 @@ Always call the filter_products function to process the user's request."""
                     print(f"   • Minimum Price: ${value}")
                 elif key == 'min_rating':
                     print(f"   • Minimum Rating: {value} stars")
-                elif key == 'in_stock_only' and value:
-                    print(f"   • In Stock Only: Yes")
+                elif key == 'max_rating':
+                    print(f"   • Maximum Rating: {value} stars")
+                elif key == 'in_stock_only':
+                    if value:
+                        print(f"   • In Stock Only: Yes")
+                    else:
+                        print(f"   • Out of Stock Only: Yes")
                 elif key == 'category':
                     print(f"   • Category: {value}")
                 elif key == 'keywords' and value:
@@ -143,9 +160,11 @@ Always call the filter_products function to process the user's request."""
         print("=" * 60)
         print("💡 Examples of what you can ask:")
         print("   • 'Show me in-stock electronics under $300 with at least 4 stars'")
-        print("   • 'I want a fitness tracker with good battery life below $150'")
+        print("   • 'I want fitness equipment below $150'")
         print("   • 'Find me kitchen appliances over $50'")
         print("   • 'Show me books under $30'")
+        print("   • 'Find out of stock products'")
+        print("   • 'Show me products with rating lower than 4.3'")
         print("=" * 60)
         
         while True:

@@ -29,9 +29,13 @@ def get_search_function_schema():
                     "type": "number",
                     "description": "Minimum rating filter (0-5)"
                 },
+                "max_rating": {
+                    "type": "number",
+                    "description": "Maximum rating filter (0-5). Use this for queries like 'rating lower than X' or 'rating below X'"
+                },
                 "in_stock_only": {
                     "type": "boolean",
-                    "description": "Whether to show only in-stock items"
+                    "description": "Filter by stock status. Set to true for 'in stock' items, false for 'out of stock' items, or null/undefined to include both"
                 },
                 "keywords": {
                     "type": "array",
@@ -44,7 +48,7 @@ def get_search_function_schema():
     }
 
 def filter_products_by_criteria(products, category=None, max_price=None, min_price=None, 
-                               min_rating=None, in_stock_only=None, keywords=None):
+                               min_rating=None, max_rating=None, in_stock_only=None, keywords=None):
     """
     Filter products based on the provided criteria.
     This function is called after OpenAI determines the filtering criteria.
@@ -65,15 +69,19 @@ def filter_products_by_criteria(products, category=None, max_price=None, min_pri
         filtered_products = [p for p in filtered_products 
                            if p.get('price', 0) >= min_price]
     
-    # Apply rating filter
+    # Apply rating filters
     if min_rating is not None:
         filtered_products = [p for p in filtered_products 
                            if p.get('rating', 0) >= min_rating]
     
-    # Apply stock filter
-    if in_stock_only:
+    if max_rating is not None:
         filtered_products = [p for p in filtered_products 
-                           if p.get('in_stock', False)]
+                           if p.get('rating', 0) <= max_rating]
+    
+    # Apply stock filter
+    if in_stock_only is not None:
+        filtered_products = [p for p in filtered_products 
+                           if p.get('in_stock', False) == in_stock_only]
     
     # Apply keyword filter
     if keywords:
