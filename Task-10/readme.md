@@ -22,7 +22,7 @@ A console-based product search application that uses OpenAI's function calling c
 
 ```bash
 # If using git
-git clone <your-repo-url>
+git clone https://github.com/Ilxom-22/edu-ai-challenge-2025.git
 cd Task-10
 
 # Or download and extract the project files
