@@ -65,10 +65,25 @@ IMPORTANT RATING FILTERING RULES:
 - For "exactly X stars": use both min_rating: X and max_rating: X
 - Never use min_rating: 0 for "lower than" queries - this includes all products regardless of rating
 
+IMPORTANT SORTING RULES:
+- For "cheapest", "lowest price", "most affordable": use sort_by: "price_asc"
+- For "most expensive", "highest price", "priciest": use sort_by: "price_desc"
+- For "best rating", "highest rated", "top rated": use sort_by: "rating_desc"
+- For "worst rating", "lowest rated", "poorly rated": use sort_by: "rating_asc"
+- For alphabetical sorting: use sort_by: "name_asc" or "name_desc"
+
+IMPORTANT LIMIT RULES:
+- For "top 5", "first 10", "show me 3", etc.: use limit: X
+- For "cheapest 5 products": use sort_by: "price_asc" AND limit: 5
+- For "3 best rated items": use sort_by: "rating_desc" AND limit: 3
+
 OTHER EXAMPLES:
 - "under $300" means max_price: 300
+- "between $50 and $200" means price_range: {{"min": 50, "max": 200}}
 - "electronics" refers to category: "Electronics"
 - "fitness tracker" might mean category: "Fitness" and keywords: ["tracker"]
+- "show me the 5 cheapest laptops" means keywords: ["laptop"], sort_by: "price_asc", limit: 5
+- "bluetooth headphones under $100" means keywords: ["bluetooth", "headphones"], max_price: 100
 
 Always call the filter_products function to process the user's request."""
 
@@ -99,10 +114,13 @@ Always call the filter_products function to process the user's request."""
                     category=criteria.get('category'),
                     max_price=criteria.get('max_price'),
                     min_price=criteria.get('min_price'),
+                    price_range=criteria.get('price_range'),
                     min_rating=criteria.get('min_rating'),
                     max_rating=criteria.get('max_rating'),
                     in_stock_only=criteria.get('in_stock_only'),
-                    keywords=criteria.get('keywords')
+                    keywords=criteria.get('keywords'),
+                    sort_by=criteria.get('sort_by'),
+                    limit=criteria.get('limit')
                 )
                 
                 return filtered_products, criteria
@@ -137,8 +155,35 @@ Always call the filter_products function to process the user's request."""
                         print(f"   • Out of Stock Only: Yes")
                 elif key == 'category':
                     print(f"   • Category: {value}")
+                elif key == 'price_range' and value:
+                    try:
+                        if isinstance(value, dict):
+                            min_val = value.get('min')
+                            max_val = value.get('max')
+                            if min_val is not None and max_val is not None:
+                                print(f"   • Price Range: ${min_val} - ${max_val}")
+                            elif min_val is not None:
+                                print(f"   • Minimum Price: ${min_val}")
+                            elif max_val is not None:
+                                print(f"   • Maximum Price: ${max_val}")
+                        else:
+                            print(f"   • Price Range: {value}")
+                    except Exception:
+                        print(f"   • Price Range: {value}")
                 elif key == 'keywords' and value:
                     print(f"   • Keywords: {', '.join(value)}")
+                elif key == 'sort_by':
+                    sort_descriptions = {
+                        'price_asc': 'Price (Cheapest First)',
+                        'price_desc': 'Price (Most Expensive First)',
+                        'rating_asc': 'Rating (Worst First)',
+                        'rating_desc': 'Rating (Best First)',
+                        'name_asc': 'Name (A-Z)',
+                        'name_desc': 'Name (Z-A)'
+                    }
+                    print(f"   • Sorted By: {sort_descriptions.get(value, value)}")
+                elif key == 'limit':
+                    print(f"   • Limit Results: {value} products")
         
         print("\n" + "="*60)
         print("🛍️  FILTERED PRODUCTS:")
@@ -161,10 +206,14 @@ Always call the filter_products function to process the user's request."""
         print("💡 Examples of what you can ask:")
         print("   • 'Show me in-stock electronics under $300 with at least 4 stars'")
         print("   • 'I want fitness equipment below $150'")
-        print("   • 'Find me kitchen appliances over $50'")
+        print("   • 'Find me kitchen appliances between $50 and $200'")
         print("   • 'Show me books under $30'")
         print("   • 'Find out of stock products'")
         print("   • 'Show me products with rating lower than 4.3'")
+        print("   • 'Show me the 5 cheapest electronics'")
+        print("   • 'Find the most expensive fitness equipment'")
+        print("   • 'Show me products with the best rating'")
+        print("   • 'What are the 3 worst rated books?'")
         print("=" * 60)
         
         while True:
