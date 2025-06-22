@@ -29,7 +29,7 @@ A complete console application that processes audio files through OpenAI's APIs 
 
 ### 1. Clone or Download the Project
 ```bash
-git clone https://github.com/Ilxom-22/edu-ai-challenge-2025/tree/main/Task-11
+git clone https://github.com/Ilxom-22/edu-ai-challenge-2025.git
 cd Task-11
 ```
 

@@ -50,14 +50,23 @@ class AudioAnalyzer:
     
     def setup_logging(self):
         """Setup logging configuration."""
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.StreamHandler(sys.stdout)
-            ]
-        )
+        # Clear any existing handlers to avoid duplicates
+        logging.getLogger().handlers.clear()
+        
+        # Set up the logger
         self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
+        
+        # Create handler if it doesn't already exist
+        if not self.logger.handlers:
+            handler = logging.StreamHandler(sys.stdout)
+            handler.setLevel(logging.INFO)
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+            
+        # Prevent propagation to root logger to avoid duplicate messages
+        self.logger.propagate = False
     
     def setup_output_directory(self):
         """Create output directory if it doesn't exist."""
@@ -139,24 +148,46 @@ class AudioAnalyzer:
         target_length = min(300, max(150, word_count // 10))
         
         prompt = f"""
-        Please provide a concise summary of the following transcription. 
-        The summary should be approximately {target_length} words and capture the main points and key takeaways.
-        
-        Transcription:
+        You are an expert summarization specialist. Create a comprehensive yet concise summary of the following transcription.
+
+        ## Instructions:
+        1. Target length: {target_length} words (flexible ±20%)
+        2. Structure your summary with clear sections
+        3. Capture the main themes, key points, and important details
+        4. Preserve critical information, data, names, and conclusions
+        5. Use clear, professional language
+        6. Include actionable items or next steps if mentioned
+        7. Maintain the logical flow of the original content
+
+        ## Summary Format:
+        **Main Topic/Purpose:** [Brief description]
+
+        **Key Points:**
+        • [Most important point 1]
+        • [Most important point 2]
+        • [Most important point 3]
+
+        **Details & Context:** 
+        [Elaborate on the key points with supporting details, explanations, or examples mentioned in the transcription]
+
+        **Conclusions/Outcomes:** 
+        [Any decisions made, conclusions reached, or next steps identified]
+
+        ## Transcription to Summarize:
         {transcription}
-        
-        Summary:
+
+        ## Summary:
         """
         
         try:
             response = self.client.chat.completions.create(
                 model="gpt-4.1-mini",
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant that creates clear, concise summaries."},
+                    {"role": "system", "content": "You are an expert content summarizer who creates structured, informative summaries that capture both the essence and important details of any text. Always follow the requested format and maintain accuracy."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=500,
-                temperature=0.3
+                max_tokens=600,  # Increased to accommodate better structure
+                temperature=0.2  # Reduced for more consistent, focused summaries
             )
             
             content = response.choices[0].message.content
@@ -175,41 +206,114 @@ class AudioAnalyzer:
         word_count = len(transcription.split())
         speaking_speed = word_count / audio_duration if audio_duration > 0 else 0
         
-        prompt = f"""
-        Analyze the following transcription and extract the top 3-5 most frequently mentioned topics.
-        For each topic, provide a descriptive name and count how many times it's mentioned or referenced.
-        
-        Return your analysis in this exact JSON format:
-        {{
-            "topics": [
-                {{"topic": "Topic Name", "mentions": count}},
-                ...
-            ]
-        }}
-        
-        Transcription to analyze:
+        # First, identify the main topics
+        topic_identification_prompt = f"""
+        You are an expert text analyst. Analyze the following transcription and identify the 3-5 most prominent topics or themes discussed.
+
+        ## Instructions:
+        1. Focus on SUBSTANTIAL topics that are meaningfully discussed (not just mentioned in passing)
+        2. Use clear, descriptive topic names (2-4 words each)
+        3. Consider topics that span multiple sentences or paragraphs
+        4. Avoid overly broad topics like "general discussion" unless truly applicable
+        5. Look for recurring themes, concepts, or subjects
+
+        ## Transcription to analyze:
         {transcription}
+
+        ## Response Format:
+        Return ONLY a JSON array of topic names:
+        ["Topic Name 1", "Topic Name 2", "Topic Name 3"]
         """
         
         try:
-            response = self.client.chat.completions.create(
+            # Get topics first
+            topic_response = self.client.chat.completions.create(
                 model="gpt-4.1-mini",
                 messages=[
-                    {"role": "system", "content": "You are an expert text analyst. Always respond with valid JSON."},
-                    {"role": "user", "content": prompt}
+                    {"role": "system", "content": "You are an expert text analyst who identifies key topics with precision. Always respond with valid JSON array format."},
+                    {"role": "user", "content": topic_identification_prompt}
                 ],
-                max_tokens=300,
+                max_tokens=200,
                 temperature=0.1
             )
             
-            # Parse the topics from GPT response
-            content = response.choices[0].message.content
-            gpt_response = content.strip() if content else ""
+            topic_content = topic_response.choices[0].message.content
+            topic_content = topic_content.strip() if topic_content else ""
             try:
-                topics_data = json.loads(gpt_response)
-                topics = topics_data.get("topics", [])
+                identified_topics = json.loads(topic_content)
+                if not isinstance(identified_topics, list):
+                    identified_topics = ["General Discussion"]
             except json.JSONDecodeError:
-                self.logger.warning("Could not parse topics from GPT response, using fallback")
+                self.logger.warning("Could not parse topics from first response, using fallback")
+                identified_topics = ["General Discussion"]
+            
+            # Now count mentions for each identified topic
+            counting_prompt = f"""
+            You are an expert text analyst specializing in frequency analysis. For each topic below, count how many times it is mentioned, referenced, or discussed in the transcription.
+
+            ## Counting Rules:
+            1. Count DIRECT mentions of the topic by name
+            2. Count SYNONYMS and related terms (e.g., "AI" and "artificial intelligence")
+            3. Count CONCEPTUAL references (discussing the topic without naming it directly)
+            4. Count CONTEXTUAL discussions (extended talk about the topic)
+            5. DO NOT count articles, pronouns, or unrelated words that happen to contain the topic word
+            6. Be thorough but accurate - reread the text carefully for each topic
+
+            ## Topics to count:
+            {json.dumps(identified_topics)}
+
+            ## Transcription to analyze:
+            {transcription}
+
+            ## Response Format:
+            Return ONLY valid JSON in this exact format:
+            {{
+                "topics": [
+                    {{"topic": "Topic Name", "mentions": actual_count}},
+                    {{"topic": "Topic Name", "mentions": actual_count}}
+                ]
+            }}
+            """
+            
+            # Get mention counts
+            count_response = self.client.chat.completions.create(
+                model="gpt-4.1-mini",
+                messages=[
+                    {"role": "system", "content": "You are a meticulous text analyst who counts topic mentions with perfect accuracy. Always respond with valid JSON. Take your time to count carefully."},
+                    {"role": "user", "content": counting_prompt}
+                ],
+                max_tokens=400,
+                temperature=0.0  # Maximum determinism for counting
+            )
+            
+            # Parse the counting results
+            count_content = count_response.choices[0].message.content
+            count_content = count_content.strip() if count_content else ""
+            try:
+                topics_data = json.loads(count_content)
+                topics = topics_data.get("topics", [])
+                
+                # Validate and clean the results
+                valid_topics = []
+                for topic in topics:
+                    if isinstance(topic, dict) and "topic" in topic and "mentions" in topic:
+                        mention_count = topic["mentions"]
+                        # Ensure mention count is a positive integer
+                        if isinstance(mention_count, (int, float)) and mention_count > 0:
+                            valid_topics.append({
+                                "topic": str(topic["topic"]),
+                                "mentions": int(mention_count)
+                            })
+                
+                # Sort by mention count (descending) and take top 5
+                topics = sorted(valid_topics, key=lambda x: x["mentions"], reverse=True)[:5]
+                
+                # If no valid topics found, use fallback
+                if not topics:
+                    topics = [{"topic": "General Discussion", "mentions": 1}]
+                    
+            except json.JSONDecodeError:
+                self.logger.warning("Could not parse mention counts, using fallback")
                 topics = [{"topic": "General Discussion", "mentions": 1}]
             
             # Create final analytics
@@ -221,7 +325,7 @@ class AudioAnalyzer:
                 "timestamp": datetime.datetime.now().isoformat() + "Z"
             }
             
-            self.logger.info("Analytics extraction completed")
+            self.logger.info(f"Analytics extraction completed. Found {len(topics)} topics.")
             return analytics
             
         except Exception as e:

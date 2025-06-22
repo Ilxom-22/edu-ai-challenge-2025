@@ -1,28 +1,28 @@
 {
-  "word_count": 982,
-  "speaking_speed_wpm": 131.4,
+  "word_count": 978,
+  "speaking_speed_wpm": 130.9,
   "audio_duration_minutes": 7.5,
   "frequently_mentioned_topics": [
     {
-      "topic": "Chest Pain",
+      "topic": "Chest Pain Symptoms",
       "mentions": 18
     },
     {
-      "topic": "Heart Attack Concern",
-      "mentions": 9
-    },
-    {
-      "topic": "Symptoms and Medical History",
-      "mentions": 14
-    },
-    {
-      "topic": "Medications and Treatment",
-      "mentions": 6
-    },
-    {
-      "topic": "Patient Background and Lifestyle",
+      "topic": "Heart Attack Concerns",
       "mentions": 7
+    },
+    {
+      "topic": "Medical History and Family Background",
+      "mentions": 7
+    },
+    {
+      "topic": "Lifestyle and Social Factors",
+      "mentions": 7
+    },
+    {
+      "topic": "Diagnostic Evaluation and Testing",
+      "mentions": 5
     }
   ],
-  "timestamp": "2025-06-22T11:00:21.858063Z"
+  "timestamp": "2025-06-22T19:02:21.292506Z"
 }
