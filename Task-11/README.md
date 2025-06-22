@@ -236,13 +236,33 @@ python main.py french_meeting.wav
 The JSON analytics output follows this exact schema:
 ```json
 {
-  "word_count": number,
-  "speaking_speed_wpm": number,
-  "audio_duration_minutes": number,
+  "language": "English",
+  "word_count": 982,
+  "speaking_speed_wpm": 131,
+  "audio_duration_minutes": 7.5,
+  "timestamp": "2025-06-22T23:32:15.146633Z",
   "frequently_mentioned_topics": [
-    { "topic": string, "mentions": number }
-  ],
-  "timestamp": "ISO 8601 string"
+    {
+      "topic": "Chest Pain Symptoms",
+      "mentions": 22
+    },
+    {
+      "topic": "Heart Attack Concerns",
+      "mentions": 8
+    },
+    {
+      "topic": "Lifestyle and Social Factors",
+      "mentions": 8
+    },
+    {
+      "topic": "Medical History and Family Background",
+      "mentions": 7
+    },
+    {
+      "topic": "Diagnostic Testing and Management",
+      "mentions": 7
+    }
+  ]
 }
 ```
 
