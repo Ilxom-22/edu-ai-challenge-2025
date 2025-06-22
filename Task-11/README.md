@@ -114,15 +114,33 @@ The application creates an `outputs/` directory and generates three files with t
 ### 3. Analytics (`analysis_YYYYMMDD_HHMMSS.json`)
 ```json
 {
-  "word_count": 1280,
-  "speaking_speed_wpm": 132,
-  "audio_duration_minutes": 9.7,
+  "language": "English",
+  "word_count": 982,
+  "speaking_speed_wpm": 131,
+  "audio_duration_minutes": 7.5,
+  "timestamp": "2025-06-22T23:32:15.146633Z",
   "frequently_mentioned_topics": [
-    { "topic": "Customer Onboarding", "mentions": 6 },
-    { "topic": "Q4 Roadmap", "mentions": 4 },
-    { "topic": "AI Integration", "mentions": 3 }
-  ],
-  "timestamp": "2024-12-15T14:30:00Z"
+    {
+      "topic": "Chest Pain Symptoms",
+      "mentions": 22
+    },
+    {
+      "topic": "Heart Attack Concerns",
+      "mentions": 8
+    },
+    {
+      "topic": "Lifestyle and Social Factors",
+      "mentions": 8
+    },
+    {
+      "topic": "Medical History and Family Background",
+      "mentions": 7
+    },
+    {
+      "topic": "Diagnostic Testing and Management",
+      "mentions": 7
+    }
+  ]
 }
 ```
 
