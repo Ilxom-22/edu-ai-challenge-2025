@@ -1,0 +1,28 @@
+{
+  "word_count": 982,
+  "speaking_speed_wpm": 131.4,
+  "audio_duration_minutes": 7.5,
+  "frequently_mentioned_topics": [
+    {
+      "topic": "Chest Pain",
+      "mentions": 18
+    },
+    {
+      "topic": "Heart Attack Concern",
+      "mentions": 9
+    },
+    {
+      "topic": "Symptoms and Medical History",
+      "mentions": 14
+    },
+    {
+      "topic": "Medications and Treatment",
+      "mentions": 6
+    },
+    {
+      "topic": "Patient Background and Lifestyle",
+      "mentions": 7
+    }
+  ],
+  "timestamp": "2025-06-22T11:00:21.858063Z"
+}

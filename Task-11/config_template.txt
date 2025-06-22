@@ -1,0 +1,10 @@
+# OpenAI API Configuration Template
+# Copy this to .env or set as environment variable
+
+OPENAI_API_KEY=your_openai_api_key_here
+
+# On Windows:
+# set OPENAI_API_KEY=your_actual_api_key
+#
+# On macOS/Linux:
+# export OPENAI_API_KEY=your_actual_api_key 
